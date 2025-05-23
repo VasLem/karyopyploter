@@ -1,5 +1,3 @@
-[![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.15499174.svg)](https://dx.doi.org/10.5281/zenodo.15499174)
-
 # karyopyploter
 
 [![PyPI - Version](https://img.shields.io/pypi/v/karyopyploter.svg)](https://pypi.org/project/karyopyploter)
