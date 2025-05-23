@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: 2025-present vaslem <vaslemonidis@hotmail.com>
 #
 # SPDX-License-Identifier: MIT
-__version__ = "0.1.3"
+__version__ = "0.1.4"
  
