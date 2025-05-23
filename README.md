@@ -1,4 +1,4 @@
-[![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.15498776.svg)](https://dx.doi.org/10.5281/zenodo.15498776)
+[![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.15499174.svg)](https://dx.doi.org/10.5281/zenodo.15499174)
 
 # karyopyploter
 
