@@ -26,10 +26,10 @@ classifiers = [
   "Topic :: Scientific/Engineering :: Bio-Informatics",
 ]
 dependencies = [
-    "typeguard",
-    "matplotlib",
-    "numpy",
-    "pandas"
+    "typeguard>=4.0.0",
+    "matplotlib>=3.0.0",
+    "numpy>=2.0.0",
+    "pandas>=2.0.0"
 ]
 
 [project.optional-dependencies]
