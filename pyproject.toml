@@ -1,0 +1,142 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "karyopyploter"
+dynamic = ["version"]
+description = 'Draw an ideogram of either HG38 or CHM13 contigs in a matplotlib axes object.'
+readme = "README.md"
+requires-python = ">=3.10"
+keywords = []
+authors = [
+  { name = "vaslem", email = "vaslemonidis@hotmail.com" },
+  { name = "Adoni5", email = "roryjmunro1@gmail.com" }
+]
+classifiers = [
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: MIT License",
+  "Natural Language :: English",
+  "Operating System :: OS Independent",
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy",
+  "Topic :: Scientific/Engineering :: Bio-Informatics",
+]
+dependencies = [
+    "typeguard",
+    "matplotlib",
+    "numpy",
+    "pandas",
+]
+
+[project.optional-dependencies]
+dev = [
+  "black>=23.1.0",
+  "mypy>=1.0.0",
+  "ruff>=0.0.243",
+  "coverage[toml]>=6.5",
+  "pytest",
+  "isort",
+  "pre-commit",
+  "karyopyploter"
+]
+
+[project.urls]
+Documentation = "https://github.com/vaslem/karyopyploter#readme"
+Issues = "https://github.com/vaslem/karyopyploter/issues"
+Source = "https://github.com/vaslem/karyopyploter"
+
+[tool.hatch.version]
+path = "src/karyopyploter/__about__.py"
+
+[tool.black]
+target-version = ["py37"]
+line-length = 120
+skip-string-normalization = true
+
+[tool.ruff]
+target-version = "py310"
+line-length = 120
+extend-select = ["I"]
+select = [
+  "A",
+  "ARG",
+  "B",
+  "C",
+  "DTZ",
+  "E",
+  "EM",
+  "F",
+  "FBT",
+  "I",
+  "ICN",
+  "ISC",
+  "N",
+  "PLC",
+  "PLE",
+  "PLR",
+  "PLW",
+  "Q",
+  "RUF",
+  "S",
+  "T",
+  "TID",
+  "UP",
+  "W",
+  "YTT",
+]
+ignore = [
+  # Allow non-abstract empty methods in abstract base classes
+  "B027",
+  # Allow boolean positional values in function calls, like `dict.get(... True)`
+  "FBT003",
+  # Ignore checks for possible passwords
+  "S105", "S106", "S107",
+  # Ignore complexity
+  "C901", "PLR0911", "PLR0912", "PLR0913", "PLR0915",
+]
+unfixable = [
+  # Don't touch unused imports
+  "F401",
+]
+exclude = ["__init__.py"]
+
+[tool.ruff.isort]
+known-first-party = ["ideogram"]
+
+[tool.ruff.flake8-tidy-imports]
+ban-relative-imports = "all"
+
+[tool.ruff.per-file-ignores]
+# Tests can use magic values, assertions, and relative imports
+"tests/**/*" = ["PLR2004", "S101", "TID252"]
+
+[tool.coverage.run]
+source_pkgs = ["karyopyploter"]
+branch = true
+parallel = true
+omit = [
+  "src/karyopyploter/__about__.py",
+]
+
+[tool.coverage.paths]
+ideogram = ["src/karyopyploter"]
+
+[tool.coverage.report]
+exclude_lines = [
+  "no cov",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+]
+
+[tool.isort]
+profile = "black"
+
+[tool.pytest.ini_options]
+
+addopts = ["-ra", "--doctest-modules"]
+doctest_optionflags = "ELLIPSIS"
