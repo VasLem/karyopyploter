@@ -13,13 +13,12 @@
   - [Acknowledgements](#acknowledgements)
   - [Installation](#installation)
   - [Example usage](#example-usage)
-  - [CNV from bam](#cnv-from-bam)
-  - [Bandage friendly CSV](#bandage-friendly-csv)
+  - [TODOs](#todos)
   - [License](#license)
   - [Cytoband data](#cytoband-data)
 
 ## Acknowledgements
-This project was based on the work by @Adoni5 and his repository [pyryotype](https://github.com/Adoni5/pyryotype). 
+This project was based on the work by @Adoni5 and his repository [pyryotype](https://github.com/Adoni5/pyryotype). It was made to provide similar functionality to what is being offered by [KaryoploteR](https://bioconductor.org/packages/release/bioc/html/karyoploteR.html) package, but in a more pythonic style, using Matplotlib as the basis, and giving the user full liberty to plot anything they want. 
 
 ## Installation
 
@@ -82,11 +81,13 @@ fig.savefig(OUT_DIR / "ideogram5.png", dpi=300)
 Will output:
 ![Example ideogram 5](https://raw.githubusercontent.com/vaslem/karyopyploter/main/example_outputs/readme_example/ideogram5.png?raw=true)
 
+## TODOs
+- Add the ability to have axis ticks in human format
+- Provide more detailed documentation, as some features are not described (e.g. the `make_genome_grid` function)
 
 ## License
 
-`karyopyploter` is distributed under the terms of the [MIT](https://spdx.org/licenses/MIT.html) license.
-Feel free
+`karyopyploter` is distributed under the terms of the BSD-3-Clause license. Feel free to use in both academic and commercial applications, and please consider to cite the software in your work.
 
 ## Cytoband data
 * HG38 
