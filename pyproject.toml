@@ -5,13 +5,12 @@ build-backend = "hatchling.build"
 [project]
 name = "karyopyploter"
 dynamic = ["version"]
-description = 'Draw an ideogram of either HG38 or CHM13 contigs in a matplotlib axes object.'
+description = 'Package to mimic the functionality of KaryoploteR, but in Python.'
 readme = "README.md"
 requires-python = ">=3.10"
 keywords = []
 authors = [
-  { name = "vaslem", email = "vaslemonidis@hotmail.com" },
-  { name = "Adoni5", email = "roryjmunro1@gmail.com" }
+  { name = "vaslem", email = "vaslemonidis@hotmail.com" }
 ]
 classifiers = [
   "Intended Audience :: Science/Research",
@@ -30,7 +29,7 @@ dependencies = [
     "typeguard",
     "matplotlib",
     "numpy",
-    "pandas",
+    "pandas"
 ]
 
 [project.optional-dependencies]
