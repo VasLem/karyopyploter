@@ -1,3 +1,4 @@
+[![DOI](https://zenodo.org/badge/989199491.svg)](https://zenodo.org/badge/latestdoi/989199491)
 # karyopyploter
 
 [![PyPI - Version](https://img.shields.io/pypi/v/karyopyploter.svg)](https://pypi.org/project/karyopyploter)
