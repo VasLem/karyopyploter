@@ -1,17 +1,17 @@
 cff-version: "1.1.0"
 message: "If you use this software, please cite it as below."
 authors:
-  - family-names: Lemonidis
-    given-names: Vasileios
+- family-names: Lemonidis
+  given-names: Vasileios
 orcid: "http://orcid.org/0000-0002-6446-3536"
 keywords:
-  - "data-science"
-  - 'python"
-  - "bioinformatics"
-  - "cytoband"
-  - "plotting"
-  - "visualization"
-  - "genomics"
+- "data-science"
+- 'python"
+- "bioinformatics"
+- "cytoband"
+- "plotting"
+- "visualization"
+- "genomics"
 title: "karyoploter"
 version: "0.1.4"
 date-released: 2025-05-23
