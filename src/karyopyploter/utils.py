@@ -13,14 +13,15 @@ def set_xmargin(ax: Axes, left: float = 0.1, right: float = 0.0) -> None:
     :param ax: The Axes object to modify.
     :param left: Factor by which to expand the left x-axis limit.
     :param right: Factor by which to expand the right x-axis limit.
-
+    
+    >>> import numpy as np
     >>> import matplotlib.pyplot as plt
     >>> fig, ax = plt.subplots()
     >>> ax.set_xlim(0, 10)
     (0.0, 10.0)
     >>> set_xmargin(ax)
     >>> ax.get_xlim()
-    (-1.0, 10.0)
+    (np.float64(-1.0), np.float64(10.0)
     """
 
     # https://stackoverflow.com/a/49382894
@@ -41,13 +42,14 @@ def set_ymargin(ax: Axes, top: float = 0.1, bottom: float = 0.0) -> None:
     :param top: Factor by which to expand the top y-axis limit.
     :param bottom: Factor by which to expand the bottom y-axis limit.
 
+    >>> import numpy as np
     >>> import matplotlib.pyplot as plt
     >>> fig, ax = plt.subplots()
     >>> ax.set_ylim(0, 10)
     (0.0, 10.0)
     >>> set_ymargin(ax)
     >>> ax.get_ylim()
-    (0.0, 11.0)
+    (np.float64(0.0), np.float64(11.0))
     """
 
     # https://stackoverflow.com/a/49382894
@@ -108,7 +110,7 @@ def chr_to_ord(x: str):
         return ("chr", int(chr), out[2])
     return (".", int(chr), "")  # make sure the canonical part stays on top
 
-def get_cytoband_df(genome: GENOME, relative: bool) -> pd.DataFrame:
+def get_cytoband_df(genome: GENOME, relative: bool = True) -> pd.DataFrame:
     """
     Convert the cytogram file for the given genome into a dataframe.
     :param genome: The genome to plot the ideogram for.
