@@ -21,7 +21,7 @@ def set_xmargin(ax: Axes, left: float = 0.1, right: float = 0.0) -> None:
     (0.0, 10.0)
     >>> set_xmargin(ax)
     >>> ax.get_xlim()
-    (np.float64(-1.0), np.float64(10.0)
+    (np.float64(-1.0), np.float64(10.0))
     """
 
     # https://stackoverflow.com/a/49382894
