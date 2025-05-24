@@ -1,9 +1,9 @@
-[![DOI](https://zenodo.org/badge/989199491.svg)](https://zenodo.org/badge/latestdoi/989199491)
 # karyopyploter
+[![DOI](https://zenodo.org/badge/989199491.svg)](https://zenodo.org/badge/latestdoi/989199491)
 
 [![PyPI - Version](https://img.shields.io/pypi/v/karyopyploter.svg)](https://pypi.org/project/karyopyploter)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/karyopyploter.svg)](https://pypi.org/project/karyopyploter)
-
+[![Python package](https://github.com/VasLem/karyopyploter/actions/workflows/python-package.yml/badge.svg)](https://github.com/VasLem/karyopyploter/actions/workflows/python-package.yml)
 -----
 
 **Table of Contents**
