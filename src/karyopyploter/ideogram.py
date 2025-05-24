@@ -131,7 +131,7 @@ def plot_ideogram(
     :param right_margin: Margin for the right side of the x-axis.
     :param left_margin: Margin for the left side of the x-axis.
     :param target_region_extent: Extent of the target region highlight.
-    :param orientation: ORIENTATION of ideogram. False draws horizontal ideograms.
+    :param orientation: orientation of ideogram.
     :param regions: List of regions to colour in on the karyotype. Respects orientation kwarg - a region should
     be a tuple of format (start, stop, colour)
     :param cytobands_df: DataFrame containing cytoband data with columns "chrom", "chromStart",
