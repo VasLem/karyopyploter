@@ -4,7 +4,10 @@ from pathlib import Path
 from matplotlib import pyplot as plt
 from karyopyploter import plot_ideogram
 from karyopyploter.ideogram import GENOME, DETAIL, ORIENTATION
+from filecmp import cmp as filecmp
 
+TEST_DIR = Path(__file__).parent.parent / "test_data" / "ideogram"
+TEST_DIR.mkdir(parents=True, exist_ok=True)
 OUT_DIR = Path(__file__).parent.parent / "example_outputs" / "ideogram"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -19,7 +22,10 @@ def test_simple_vertical_chr3():
 
     plot_ideogram(ax, target="chr3", left_margin=0, label="", orientation=ORIENTATION.VERTICAL)
 
-    fig.savefig(OUT_DIR / "testing_vert_chr3.png", bbox_inches="tight")
+    fig.savefig(TEST_DIR / "vert_chr3.png", bbox_inches="tight")
+    assert filecmp(TEST_DIR / "vert_chr3.png", OUT_DIR / "vert_chr3.png")
+
+
 def test_simple_horizontal_chr3():
     fig, ax = plt.subplots(
         ncols=1,
@@ -30,8 +36,10 @@ def test_simple_horizontal_chr3():
 
     plot_ideogram(ax, target="chr3", left_margin=0, label="", orientation=ORIENTATION.HORIZONTAL)
 
-    fig.savefig(OUT_DIR / "testing_horz_chr3.png", bbox_inches="tight")
-    
+    fig.savefig(TEST_DIR / "horz_chr3.png", bbox_inches="tight")
+    assert filecmp(TEST_DIR / "horz_chr3.png", OUT_DIR / "horz_chr3.png")
+
+
 def test_simple_horizontal_chr1():
     fig, ax = plt.subplots(
         ncols=1,
@@ -42,8 +50,23 @@ def test_simple_horizontal_chr1():
 
     plot_ideogram(ax, target="chr1", left_margin=0, label="", orientation=ORIENTATION.HORIZONTAL)
 
-    fig.savefig(OUT_DIR / "testing_horz_chr1.png", bbox_inches="tight")
-    
+    fig.savefig(TEST_DIR / "horz_chr1.png", bbox_inches="tight")
+    assert filecmp(TEST_DIR / "horz_chr1.png", OUT_DIR / "horz_chr1.png")
+
+
+def test_simple_horizontal_chr1_with_coordinates():
+    fig, ax = plt.subplots(
+        ncols=1,
+        nrows=1,
+        figsize=(25, 3),
+        facecolor="white",
+    )
+
+    plot_ideogram(ax, target="chr1", left_margin=0, label="", orientation=ORIENTATION.HORIZONTAL, show_coordinates=True)
+
+    fig.savefig(TEST_DIR / "horz_chr1_with_coordinates.png", bbox_inches="tight")
+    assert filecmp(TEST_DIR / "horz_chr1_with_coordinates.png", OUT_DIR / "horz_chr1_with_coordinates.png")
+
 
 def test_simple_vertical_chr1_start_stop():
     fig, ax = plt.subplots(
@@ -53,11 +76,43 @@ def test_simple_vertical_chr1_start_stop():
         facecolor="white",
     )
 
-    plot_ideogram(ax, target="chr1", left_margin=0, label="", orientation=ORIENTATION.VERTICAL, start=150000, stop=50000000)
+    plot_ideogram(
+        ax, target="chr1", left_margin=0, label="", orientation=ORIENTATION.VERTICAL, start=150000, stop=50000000
+    )
 
-    fig.savefig(OUT_DIR / "testing_vert_chr1_start_stop.png", bbox_inches="tight")
-    
-    
+    fig.savefig(TEST_DIR / "vert_chr1_start_stop.png", bbox_inches="tight")
+    assert filecmp(
+        TEST_DIR / "vert_chr1_start_stop.png",
+        OUT_DIR / "vert_chr1_start_stop.png",
+    )
+
+
+def test_simple_vertical_chr1_start_stop_with_coordinates():
+    fig, ax = plt.subplots(
+        ncols=1,
+        nrows=1,
+        figsize=(3, 25),
+        facecolor="white",
+    )
+
+    plot_ideogram(
+        ax,
+        target="chr1",
+        left_margin=0,
+        label="",
+        orientation=ORIENTATION.VERTICAL,
+        start=150000,
+        stop=50000000,
+        show_coordinates=True,
+    )
+
+    fig.savefig(TEST_DIR / "vert_chr1_start_stop_with_coordinates.png", bbox_inches="tight")
+    assert filecmp(
+        TEST_DIR / "vert_chr1_start_stop_with_coordinates.png",
+        OUT_DIR / "vert_chr1_start_stop_with_coordinates.png",
+    )
+
+
 def test_simple_horizontal_chr1_start_stop():
     fig, ax = plt.subplots(
         ncols=1,
@@ -66,10 +121,16 @@ def test_simple_horizontal_chr1_start_stop():
         facecolor="white",
     )
 
-    plot_ideogram(ax, target="chr1", left_margin=0, label="", orientation=ORIENTATION.HORIZONTAL, start=150000, stop=50000000)
+    plot_ideogram(
+        ax, target="chr1", left_margin=0, label="", orientation=ORIENTATION.HORIZONTAL, start=150000, stop=50000000
+    )
 
-    fig.savefig(OUT_DIR / "testing_horz_start_stop.png", bbox_inches="tight")
-    
+    fig.savefig(TEST_DIR / "horz_start_stop.png", bbox_inches="tight")
+    assert filecmp(
+        TEST_DIR / "horz_start_stop.png",
+        OUT_DIR / "horz_start_stop.png",
+    )
+
 
 def test_23_vertical_chm13():
     genome = GENOME.CHM13
@@ -77,13 +138,20 @@ def test_23_vertical_chm13():
 
     for ax, i in zip(axes, chain(range(1, 23), iter("XY")), strict=True):
         _ax = plot_ideogram(
-            ax, target=f"chr{i}", label=f"Chr. {i}", 
-            orientation=ORIENTATION.VERTICAL, genome=genome,
-            grid_params=dict(left_margin=0),
-            label_params={"rotation": 90}
+            ax,
+            target=f"chr{i}",
+            label=f"Chr. {i}",
+            orientation=ORIENTATION.VERTICAL,
+            genome=genome,
+            left_margin=0,
+            label_params={"rotation": 90},
         )
 
-    fig.savefig(OUT_DIR / "testing_vert_23.png", bbox_inches="tight")
+    fig.savefig(TEST_DIR / "vert_23.png", bbox_inches="tight")
+    assert filecmp(
+        TEST_DIR / "vert_23.png",
+        OUT_DIR / "vert_23.png",
+    )
 
 
 def test_23_vertical_hg38():
@@ -92,13 +160,21 @@ def test_23_vertical_hg38():
 
     for ax, i in zip(axes, chain(range(1, 23)), strict=True):
         _ax = plot_ideogram(
-            ax, target=f"chr{i}", label=f"Chr. {i}", left_margin=0, 
+            ax,
+            target=f"chr{i}",
+            label=f"Chr. {i}",
+            left_margin=0,
             label_params={"rotation": 90},
-            orientation=ORIENTATION.VERTICAL, 
-            genome=genome, relative=True
+            orientation=ORIENTATION.VERTICAL,
+            genome=genome,
+            relative=True,
         )
 
-    fig.savefig(OUT_DIR / "testing_vert_23_hg38.png", bbox_inches="tight")
+    fig.savefig(TEST_DIR / "vert_23_hg38.png", bbox_inches="tight")
+    assert filecmp(
+        TEST_DIR / "vert_23_hg38.png",
+        OUT_DIR / "vert_23_hg38.png",
+    )
 
 
 def test_23_vertical_hg19():
@@ -107,13 +183,20 @@ def test_23_vertical_hg19():
 
     for ax, i in zip(axes, chain(range(1, 23)), strict=True):
         _ax = plot_ideogram(
-            ax, target=f"chr{i}", label=f"Chr. {i}", 
-            left_margin=0, orientation=ORIENTATION.VERTICAL, 
+            ax,
+            target=f"chr{i}",
+            label=f"Chr. {i}",
+            left_margin=0,
+            orientation=ORIENTATION.VERTICAL,
             label_params={"rotation": 90},
-            genome=genome
+            genome=genome,
         )
 
-    fig.savefig(OUT_DIR / "testing_vert_23_hg19.png", bbox_inches="tight")
+    fig.savefig(TEST_DIR / "vert_23_hg19.png", bbox_inches="tight")
+    assert filecmp(
+        TEST_DIR / "vert_23_hg19.png",
+        OUT_DIR / "vert_23_hg19.png",
+    )
 
 
 def test_23_vertical_chm13_bare():
@@ -132,7 +215,11 @@ def test_23_vertical_chm13_bare():
             genome=genome,
         )
 
-    fig.savefig(OUT_DIR / "testing_vert_bare_23.png", bbox_inches="tight")
+    fig.savefig(TEST_DIR / "vert_bare_23.png", bbox_inches="tight")
+    assert filecmp(
+        TEST_DIR / "vert_bare_23.png",
+        OUT_DIR / "vert_bare_23.png",
+    )
 
 
 def test_23_horizontal_chm13_bare():
@@ -150,7 +237,11 @@ def test_23_horizontal_chm13_bare():
             genome=genome,
         )
 
-    fig.savefig(OUT_DIR / "testing_horz_bare_23.png", bbox_inches="tight")
+    fig.savefig(TEST_DIR / "horz_bare_23.png", bbox_inches="tight")
+    assert filecmp(
+        TEST_DIR / "horz_bare_23.png",
+        OUT_DIR / "horz_bare_23.png",
+    )
 
 
 def test_23_vertical_chm13_regions():
@@ -171,7 +262,11 @@ def test_23_vertical_chm13_regions():
             regions=regions,
         )
 
-    fig.savefig(OUT_DIR / "testing_vert_23_regions_chm13.png", bbox_inches="tight")
+    fig.savefig(TEST_DIR / "vert_23_regions_chm13.png", bbox_inches="tight")
+    assert filecmp(
+        TEST_DIR / "vert_23_regions_chm13.png",
+        OUT_DIR / "vert_23_regions_chm13.png",
+    )
 
 
 def test_23_horz_chm13_regions():
@@ -184,7 +279,7 @@ def test_23_horz_chm13_regions():
         _ax = plot_ideogram(
             ax,
             target=f"chr{i}",
-            y_label=f"Chr. {i}",
+            label=f"Chr. {i}",
             left_margin=0,
             height=0.99,
             orientation=ORIENTATION.HORIZONTAL,
@@ -192,4 +287,8 @@ def test_23_horz_chm13_regions():
             regions=regions,
         )
 
-    fig.savefig(OUT_DIR / "testing_horz_23_regions.png", bbox_inches="tight")
+    fig.savefig(TEST_DIR / "horz_23_regions.png", bbox_inches="tight")
+    assert filecmp(
+        TEST_DIR / "horz_23_regions.png",
+        OUT_DIR / "horz_23_regions.png",
+    )

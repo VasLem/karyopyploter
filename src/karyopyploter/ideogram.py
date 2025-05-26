@@ -2,7 +2,7 @@ import pandas as pd
 from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
 from matplotlib.axes._secondary_axes import SecondaryAxis
-from matplotlib.patches import PathPatch, Rectangle
+from matplotlib.patches import PathPatch, Rectangle, Patch
 from matplotlib.path import Path as MplPath
 from matplotlib.typing import ColorType
 from typeguard import check_type
@@ -38,22 +38,32 @@ def add_ideogram_coordinates(
     coordinates_number: int = 8,
     coordinate_format: Union[str, Callable[[float], str]] = human_readable_coordinates,
     orientation: ORIENTATION = ORIENTATION.HORIZONTAL,
+    **tick_params,
 ):
     if isinstance(coordinate_format, str):
         coordinate_format = lambda x: f"{x:{coordinate_format}}"
     elif not callable(coordinate_format):
         raise ValueError("coordinate_format must be a string or a callable function")
     assert coordinates_number > 0, "coordinates_number must be greater than 0"
+    extents = [child.get_extents() for child in ax.get_children() if isinstance(child, PathPatch)]
     if orientation == ORIENTATION.HORIZONTAL:
-        lims = ax.get_xlim()
+        lims = min([extent.x0 for extent in extents]), max([extent.x1 for extent in extents])
+        lims = ax.transData.inverted().transform([[lims[0], 0], [lims[1], 0]])[:, 0]
+        lims = max(lims[0], ax.get_xlim()[0]), min(lims[1], ax.get_xlim()[1])
     else:
-        lims = ax.get_ylim()
+        lims = min([extent.y0 for extent in extents]), max([extent.y1 for extent in extents])
+        lims = ax.transData.inverted().transform([[0, lims[0]], [0, lims[1]]])[:, 1]
+        lims = max(lims[0], ax.get_ylim()[0]), min(lims[1], ax.get_ylim()[1])
+
     ticks = [lims[0] + (lims[1] - lims[0]) * i / (coordinates_number - 1) for i in range(coordinates_number)]
     labels = [coordinate_format(tick) for tick in ticks]
     if orientation == ORIENTATION.HORIZONTAL:
-        ax.set_xticks(ticks, labels=labels)
+        ax.xaxis.set_visible(True)
+        ax.set_xticks(ticks, labels=labels, **tick_params)
+
     else:
-        ax.set_yticks(ticks, labels=labels)
+        ax.yaxis.set_visible(True)
+        ax.set_yticks(ticks, labels=labels, **tick_params)
 
 
 def annotate_ideogram(
@@ -65,9 +75,13 @@ def annotate_ideogram(
     **kwargs,
 ):
     """
-    Annotate the ideogram with regions.
+    Annotate ideogram regions with rectangles.
     :param ax: The axis to annotate.
     :param regions: List of regions to annotate.
+    :param lower_anchor: Lower anchor point for the ideogram, for outline.
+    :param height: Height of the ideogram.
+    :param orientation: Orientation of the ideogram (horizontal or vertical).
+    :param kwargs: Additional keyword arguments for the rectangle patches.
     """
     assert isinstance(regions, list), "Regions must be a list of tuples"
     for region in regions:
@@ -365,7 +379,7 @@ def plot_ideogram(
     ax.xaxis.set_visible(False)
     ax.yaxis.set_visible(False)
 
-    def get_secondary_axis(ax, which: str):
+    def get_secondary_axis(ax, which: str, add_offset=False):
         for x in ax.get_children():
             if isinstance(x, SecondaryAxis):
                 if which == "x" and x._loc == "bottom":
@@ -373,30 +387,36 @@ def plot_ideogram(
                 if which == "y" and x._loc == "left":
                     return x
         if which == "x":
-            return ax.secondary_xaxis("bottom")
+            return ax.secondary_xaxis(-0.3 if add_offset else "bottom")
         else:
-            return ax.secondary_yaxis("left")
+            return ax.secondary_yaxis(-0.3 if add_offset else "left")
 
+    if show_coordinates:
+        add_ideogram_coordinates(
+            ax,
+            **coordinates_params,
+            orientation=orientation,
+        )
     # Add chromosome name to the plot
     if label is not None:
         if label_placement == "height":
             to_place = height / 2
             if orientation == ORIENTATION.VERTICAL:
-                sec = get_secondary_axis(ax, "x")
+                sec = get_secondary_axis(ax, "x", show_coordinates)
                 labs = sec.get_xticklabels()
                 locs = sec.get_xticks()
             else:
-                sec = get_secondary_axis(ax, "y")
+                sec = get_secondary_axis(ax, "y", show_coordinates)
                 labs = sec.get_yticklabels()
                 locs = sec.get_yticks()
         elif label_placement == "length":
             to_place = (chr_start + chr_end) / 2
             if orientation == ORIENTATION.VERTICAL:
-                sec = get_secondary_axis(ax, "y")
+                sec = get_secondary_axis(ax, "y", show_coordinates)
                 labs = sec.get_yticklabels()
                 locs = sec.get_yticks()
             else:
-                sec = get_secondary_axis(ax, "x")
+                sec = get_secondary_axis(ax, "x", show_coordinates)
                 labs = sec.get_xticklabels()
                 locs = sec.get_xticks()
 
@@ -449,12 +469,7 @@ def plot_ideogram(
                     plt.setp(sec.get_xticklabels()[pos], **label_params)
                 sec.spines["bottom"].set_visible(False)
         sec.tick_params(axis=u'both', which=u'both', length=0)
-    if show_coordinates:
-        add_ideogram_coordinates(
-            ax,
-            **coordinates_params,
-            orientation=orientation,
-        )
+
     return ax
 
 

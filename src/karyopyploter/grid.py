@@ -19,7 +19,7 @@ def _make_target_grid(
     start: int | None = None,
     stop: int | None = None,
     num_subplots=1,
-    subplot_width=3,
+    subplot_width=6,
     height_ratio=0.5,
     ideogram_factor: float = 0.1,
     fig: Optional[plt.Figure] = None,
@@ -87,8 +87,6 @@ def _make_target_grid(
             axes.append(ax)
         for ax in axes[1:]:
             ax.sharex(axes[0])
-            ax.set_xticks([])
-            ax.set_xticklabels([])
             ax.set_xlabel("")
         ideogram_ax = fig.add_subplot(gspec[-num_subplots:, 0], sharex=axes[0])
     else:
@@ -126,6 +124,9 @@ def _make_target_grid(
         for ax in axes:
             ax.set_xlim(ideogram_ax.get_xlim())
         axes[-1].spines["bottom"].set_visible(False)
+        for ax in axes:
+            plt.setp(ax.get_xticklabels(), visible=False)
+        axes[-1].tick_params(axis=u'both', which=u'both', length=0)
     return fig, axes, ideogram_ax
 
 
@@ -135,12 +136,12 @@ def make_ideogram_grid(
     start: Union[str, Dict[str, int]] | None = None,
     stop: Union[str, Dict[str, int]] | None = None,
     num_subplots: int = 1,
-    subplot_width: float = 5,
+    subplot_width: float = 10,
     height_ratio: Optional[float] = None,
-    fig=None,
+    fig: Optional[plt.Figure] = None,
     ideogram_factor: float = 0.1,
-    grid_params: dict = None,
-    ideogram_params: dict = None,
+    grid_params: Optional[dict] = None,
+    ideogram_params: Optional[dict] = None,
 ) -> tuple[plt.Figure, Dict[str, list[Axes]], Dict[str, Axes]]:
     """
     Create a grid of subplots, with an ideogram at the bottom. Meant to plot multiple features on the same chromosome.
@@ -230,7 +231,6 @@ def make_ideogram_grid(
             height_ratio=height_ratio,
             ideogram_factor=ideogram_factor,
             subplot_spec=gs0[i],
-            relative=True,
             fig=fig,
             ideogram_params=ideogram_params,
         )
