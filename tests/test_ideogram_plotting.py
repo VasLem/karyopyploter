@@ -78,8 +78,9 @@ def test_23_vertical_chm13():
     for ax, i in zip(axes, chain(range(1, 23), iter("XY")), strict=True):
         _ax = plot_ideogram(
             ax, target=f"chr{i}", label=f"Chr. {i}", 
-            left_margin=0, orientation=ORIENTATION.VERTICAL, genome=genome,
-            label_kwargs={"rotation": 90}
+            orientation=ORIENTATION.VERTICAL, genome=genome,
+            grid_params=dict(left_margin=0),
+            label_params={"rotation": 90}
         )
 
     fig.savefig(OUT_DIR / "testing_vert_23.png", bbox_inches="tight")
@@ -92,7 +93,7 @@ def test_23_vertical_hg38():
     for ax, i in zip(axes, chain(range(1, 23)), strict=True):
         _ax = plot_ideogram(
             ax, target=f"chr{i}", label=f"Chr. {i}", left_margin=0, 
-            label_kwargs={"rotation": 90},
+            label_params={"rotation": 90},
             orientation=ORIENTATION.VERTICAL, 
             genome=genome, relative=True
         )
@@ -108,7 +109,7 @@ def test_23_vertical_hg19():
         _ax = plot_ideogram(
             ax, target=f"chr{i}", label=f"Chr. {i}", 
             left_margin=0, orientation=ORIENTATION.VERTICAL, 
-            label_kwargs={"rotation": 90},
+            label_params={"rotation": 90},
             genome=genome
         )
 
@@ -126,7 +127,7 @@ def test_23_vertical_chm13_bare():
             label=f"Chr. {i}",
             left_margin=0,
             orientation=ORIENTATION.VERTICAL,
-            label_kwargs={"rotation": 90},
+            label_params={"rotation": 90},
             cytobands=DETAIL.BARE,
             genome=genome,
         )
@@ -165,7 +166,7 @@ def test_23_vertical_chm13_regions():
             label=f"Chr. {i}",
             left_margin=0,
             orientation=ORIENTATION.VERTICAL,
-            label_kwargs={"rotation": 90},
+            label_params={"rotation": 90},
             genome=genome,
             regions=regions,
         )
