@@ -215,7 +215,7 @@ def test_23_vertical_chm13_bare():
 
 def test_23_horizontal_chm13_bare():
     genome = GENOME.CHM13
-    fig, axes = plt.subplots(ncols=1, nrows=24, figsize=(25, 15), facecolor="white", sharey=True)
+    fig, axes = plt.subplots(ncols=1, nrows=24, figsize=(25, 15), facecolor="white", sharex=True)
 
     for ax, i in zip(axes, chain(range(1, 23), iter("XY")), strict=True):
         _ax = plot_ideogram(

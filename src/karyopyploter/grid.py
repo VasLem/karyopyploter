@@ -107,7 +107,6 @@ def _make_target_grid(
                 "start": None,
                 "stop": None,
                 "relative": ideogram_params.get("relative", False),
-                "adjust_margins": False,
             }
         )
         ideogram_ax = plot_ideogram(

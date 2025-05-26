@@ -345,11 +345,11 @@ def plot_ideogram(
     if start is not None or stop is not None:
         zoom(ax, start, stop, relative)
     else:
-        if not relative and _arrange_absolute_ax_lims:
+        if _arrange_absolute_ax_lims:
             if orientation == ORIENTATION.HORIZONTAL:
-                ax.set_xlim(chr_start, chr_end)
+                ax.set_xlim(min(ax.get_xlim()[0], chr_start), max(ax.get_xlim()[1], chr_end))
             else:
-                ax.set_ylim(chr_start, chr_end)
+                ax.set_ylim(min(ax.get_ylim()[0], chr_start), max(ax.get_ylim()[1], chr_end))
 
     if regions:
         annotate_ideogram(
