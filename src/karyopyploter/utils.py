@@ -110,7 +110,7 @@ def chr_to_ord(x: str):
         return ("chr", int(chr), out[2])
     return (".", int(chr), "")  # make sure the canonical part stays on top
 
-def get_cytoband_df(genome: GENOME, relative: bool = True) -> pd.DataFrame:
+def get_cytoband_df(genome: GENOME) -> pd.DataFrame:
     """
     Convert the cytogram file for the given genome into a dataframe.
     :param genome: The genome to plot the ideogram for.
@@ -131,23 +131,4 @@ def get_cytoband_df(genome: GENOME, relative: bool = True) -> pd.DataFrame:
     cytobands["arm"] = cytobands["name"].str[0]
     cytobands["colour"] = cytobands["gieStain"].map(COLOUR_LOOKUP)
     cytobands["width"] = cytobands["chromEnd"] - cytobands["chromStart"]
-    if relative:
-        return cytobands
-    # Sort the chromosomes in a canonical order
-    cytobands = cytobands.sort_values(
-        by="chrom",
-        key=lambda x: x.map(chr_to_ord),
-    )
-    # Add a column for the cumulated sum of the chromosome length..
-    cumsumlengths = (cytobands.groupby("chrom",sort=False)["chromEnd"].max() - cytobands.groupby("chrom",sort=False)["chromStart"].min()).cumsum()
-    # .. to produce the absolute offset of each chromosome
-    offset = pd.Series(np.hstack([[0], cumsumlengths[:-1]]), cumsumlengths.index, name="offset")
-    cytobands = cytobands.merge(
-        offset,
-        left_on="chrom",
-        right_index=True,
-    )
-    cytobands["chromStart"] += cytobands["offset"]
-    cytobands["chromEnd"] += cytobands["offset"]
-    cytobands = cytobands.drop(columns=["offset"])
     return cytobands
