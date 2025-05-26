@@ -60,7 +60,6 @@ def add_ideogram_coordinates(
     if orientation == ORIENTATION.HORIZONTAL:
         ax.xaxis.set_visible(True)
         ax.set_xticks(ticks, labels=labels, **tick_params)
-
     else:
         ax.yaxis.set_visible(True)
         ax.set_yticks(ticks, labels=labels, **tick_params)
@@ -160,6 +159,7 @@ def plot_ideogram(
     curve: float = 0.02,
     label: str | None = None,
     label_placement: Literal["height", "length"] = "height",
+    label_axis_offset: float = None,
     label_params: dict = None,
     show_coordinates: bool = False,
     coordinates_params: dict = None,
@@ -168,7 +168,6 @@ def plot_ideogram(
     regions_annotation_params: dict = None,
     cytobands_df: pd.DataFrame = None,
     cytobands: DETAIL = DETAIL.CYTOBAND,
-    relative: bool = True,
     _arrange_absolute_ax_lims: bool = True,
 ):
     """
@@ -183,6 +182,7 @@ def plot_ideogram(
     :param curve: Curve factor for the ideogram edges.
     :param label: Label for the ideogram, displayed at the top or side.
     :param label_placement: Placement of the label, either "height" (at the top) or "length" (at the side).
+    :param label_axis_offset: Offset for the label axis. If to show coordinates, the default is 0.3, otherwise 0.
     :param label_params: Additional parameters for the label, such as font size or rotation.
     :param show_coordinates: Whether to show coordinates on the ideogram.
     :param coordinates_params: Parameters for the coordinates.
@@ -193,7 +193,6 @@ def plot_ideogram(
     :param cytobands_df: DataFrame containing cytoband data with columns "chrom", "chromStart",
       "chromEnd", "gieStain", and "colour".
     :param cytobands: Whether to render cytobands
-    :param relative: Whether to plot the ideogram in relative coordinates (start of chromosome is 0) (default: True if single chromosome, False if target_stop!=target_start).
 
     :return: Updated axis object with the plotted ideogram.
 
@@ -215,6 +214,8 @@ def plot_ideogram(
         label_params = dict()
     if regions_annotation_params is None:
         regions_annotation_params = dict()
+    if label_axis_offset is None:
+        label_axis_offset = 0.3 if show_coordinates else 0
     # some checks for input before we start
     if label is not None:
         assert label_placement in ["height", "length"], "label_placement must be either 'height' or 'length'"
@@ -222,7 +223,7 @@ def plot_ideogram(
         assert start < stop, "Start must be less than stop"
 
     if cytobands_df is None:
-        df = get_cytoband_df(genome, relative=relative)
+        df = get_cytoband_df(genome)
     else:
         df = cytobands_df
     chr_names = df["chrom"].unique()
@@ -343,7 +344,7 @@ def plot_ideogram(
     ax.add_patch(chr_patch)
     # If start and stop positions are provided, draw a rectangle to highlight this region
     if start is not None or stop is not None:
-        zoom(ax, start, stop, relative)
+        zoom(ax, start, stop, orientation=orientation)
     else:
         if _arrange_absolute_ax_lims:
             if orientation == ORIENTATION.HORIZONTAL:
@@ -374,7 +375,7 @@ def plot_ideogram(
             orientation=orientation,
         )
 
-    def get_secondary_axis(ax, which: str, add_offset=False):
+    def get_secondary_axis(ax, which: str, label_axis_offset=0):
         for x in ax.get_children():
             if isinstance(x, SecondaryAxis):
                 if which == "x" and x._loc == "bottom":
@@ -382,30 +383,30 @@ def plot_ideogram(
                 if which == "y" and x._loc == "left":
                     return x
         if which == "x":
-            return ax.secondary_xaxis(-0.3 if add_offset else "bottom")
+            return ax.secondary_xaxis(-label_axis_offset if label_axis_offset else "bottom")
         else:
-            return ax.secondary_yaxis(-0.3 if add_offset else "left")
+            return ax.secondary_yaxis(-label_axis_offset if label_axis_offset else "left")
 
     # Add chromosome name to the plot
     if label is not None:
         if label_placement == "height":
             to_place = height / 2
             if orientation == ORIENTATION.VERTICAL:
-                sec = get_secondary_axis(ax, "x", show_coordinates)
+                sec = get_secondary_axis(ax, "x", label_axis_offset=label_axis_offset)
                 labs = sec.get_xticklabels()
                 locs = sec.get_xticks()
             else:
-                sec = get_secondary_axis(ax, "y", show_coordinates)
+                sec = get_secondary_axis(ax, "y", label_axis_offset=label_axis_offset)
                 labs = sec.get_yticklabels()
                 locs = sec.get_yticks()
         elif label_placement == "length":
             to_place = (chr_start + chr_end) / 2
             if orientation == ORIENTATION.VERTICAL:
-                sec = get_secondary_axis(ax, "y", show_coordinates)
+                sec = get_secondary_axis(ax, "y", label_axis_offset=label_axis_offset)
                 labs = sec.get_yticklabels()
                 locs = sec.get_yticks()
             else:
-                sec = get_secondary_axis(ax, "x", show_coordinates)
+                sec = get_secondary_axis(ax, "x", label_axis_offset=label_axis_offset)
                 labs = sec.get_xticklabels()
                 locs = sec.get_xticks()
 

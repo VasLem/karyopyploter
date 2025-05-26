@@ -14,7 +14,6 @@ from karyopyploter.utils import chr_to_ord, get_cytoband_df
 
 def _make_target_grid(
     target: Union[str, List[str]],
-    target_stop: str = None,
     genome: GENOME = GENOME.HG38,
     start: int | None = None,
     stop: int | None = None,
@@ -25,14 +24,16 @@ def _make_target_grid(
     fig: Optional[plt.Figure] = None,
     subplot_spec: Optional[SubplotSpec] = None,
     ideogram_params: Optional[dict] = None,
+    grid_params: Optional[dict] = None,
+    cytobands_df=None,
 ) -> tuple[plt.Figure, list[Axes], Axes]:
     """
     Create a grid of subplots, with an ideogram at the bottom. Meant to plot multiple features on the same chromosome.
     :param target: (Starting) target chromosome to filter and plot.
     :param target_stop: Ending target chromosome to filter and plot (optional).
     :param genome: Genome variant to use.
-    :param start: Starting base pair position for the region of interest (optional). If start is None, stop must also be None.
-    :param stop: Ending base pair position for the region of interest (optional). If stop is None, start must also be None.
+    :param start: Starting base pair position for the region of interest (optional).
+    :param stop: Ending base pair position for the region of interest (optional).
     :param num_subplots: Number of subplots to create. If 0, no subplots are created, only the ideogram axis is made.
     :param subplot_width: Width of each subplot.
     :param height_ratio: Height ratio for the subplots.
@@ -41,29 +42,14 @@ def _make_target_grid(
     :param ideogram_params: Additional keyword arguments for the ideogram plotting function.
     :return: A tuple containing the figure and a list of axes for the subplots.
     """
-    if target_stop is None:
-        target_stop = target
+    if grid_params is None:
+        grid_params = dict()
+    grid_params['hspace'] = grid_params.get('hspace', 0.05)
+    grid_params['wspace'] = grid_params.get('wspace', 0.05)
     if ideogram_params is None:
         ideogram_params = dict()
-    relative = ideogram_params.get("relative", None)
-    if relative is None:
-        relative = target == target_stop
-    cytobands_df = None
     chr_start = None
     chr_end = None
-    if target != target_stop:
-        cytobands_df = get_cytoband_df(genome, relative=False)
-        chr_names = cytobands_df["chrom"].unique()
-        chr_names = sorted(chr_names, key=chr_to_ord)
-        targets = chr_names[chr_names.index(target) : chr_names.index(target_stop) + 1]
-        cytobands_df = cytobands_df[cytobands_df['chrom'].isin(targets)]
-        chr_start = cytobands_df['chromStart'].min()
-        chr_end = cytobands_df['chromEnd'].max()
-        if relative:
-            cytobands_df['chromEnd'] = cytobands_df['chromEnd'] - cytobands_df['chromStart'].min()
-            cytobands_df['chromStart'] = cytobands_df['chromStart'] - cytobands_df['chromStart'].min()
-    else:
-        targets = [target]
     pfactor = int(1 / ideogram_factor)
     axes = []
 
@@ -77,10 +63,10 @@ def _make_target_grid(
         )
     if num_subplots > 0:
         if subplot_spec is None:
-            gspec = gs(pfactor * num_subplots + 2 * num_subplots - 1, 1, hspace=0.05, wspace=0.05)
+            gspec = gs(pfactor * num_subplots + 2 * num_subplots - 1, 1, **grid_params)
         else:
             gspec = gsFromSubplotSpec(
-                pfactor * num_subplots + 2 * num_subplots - 1, 1, subplot_spec=subplot_spec, hspace=0.05, wspace=0.05
+                pfactor * num_subplots + 2 * num_subplots - 1, 1, subplot_spec=subplot_spec, **grid_params
             )
         for i in range(num_subplots):
             ax = fig.add_subplot(gspec[pfactor * i + i : pfactor * (i + 1) + i, 0])
@@ -97,36 +83,39 @@ def _make_target_grid(
     ideogram_ax.set_xticks([])
     ideogram_ax.set_xticklabels([])
     ideogram_ax.set_xlabel("")
-    for cnt, target in enumerate(targets):
-        ideogram_params.update(
-            {
-                "target": target,
-                "genome": genome,
-                "label": target,
-                "label_placement": ideogram_params.get("label_placement", "height" if len(targets) == 1 else "length"),
-                "start": None,
-                "stop": None,
-                "relative": ideogram_params.get("relative", False),
-            }
-        )
-        ideogram_ax = plot_ideogram(
-            ideogram_ax, cytobands_df=cytobands_df, _arrange_absolute_ax_lims=False, **ideogram_params
-        )
+
     if start is None:
         start = chr_start
     if stop is None:
         stop = chr_end
+    ideogram_params.update(
+        {
+            "target": target,
+            "genome": genome,
+            "label": target,
+            "label_placement": ideogram_params.get("label_placement", "height"),
+            "start": start,
+            "stop": stop,
+        }
+    )
+    ideogram_ax = plot_ideogram(
+        ideogram_ax, cytobands_df=cytobands_df, _arrange_absolute_ax_lims=False, **ideogram_params
+    )
     # for obj in ideogram_ax.get_children():
     #     if hasattr(obj, "set_clip_on"):
     #         obj.set_clip_on(False)
     if num_subplots > 0:
-        for ax in axes:
-            ax.set_xlim(ideogram_ax.get_xlim())
-        axes[-1].spines["bottom"].set_visible(False)
-        for ax in axes:
-            plt.setp(ax.get_xticklabels(), visible=False)
-        axes[-1].tick_params(axis=u'both', which=u'both', length=0)
+        reset_coordinates(axes, ideogram_ax)
     return fig, axes, ideogram_ax
+
+
+def reset_coordinates(subplot_axes: List[Axes], ideogram_ax: Axes):
+    for ax in subplot_axes:
+        ax.set_xlim(ideogram_ax.get_xlim())
+    subplot_axes[-1].spines["bottom"].set_visible(False)
+    for ax in subplot_axes:
+        plt.setp(ax.get_xticklabels(), visible=False)
+    subplot_axes[-1].tick_params(axis=u'both', which=u'both', length=0)
 
 
 def make_ideogram_grid(
@@ -220,6 +209,12 @@ def make_ideogram_grid(
     value_axes = {}
     ideogram_axes = {}
     for i, target in enumerate(targets):
+        target_grid_params = grid_params.copy()
+        del target_grid_params['top']
+        del target_grid_params['bottom']
+        del target_grid_params['left']
+        del target_grid_params['right']
+        target_grid_params['hspace'] = target_grid_params['hspace'] / 2
         _, a0, a1 = _make_target_grid(
             target,
             genome=genome,
@@ -232,6 +227,7 @@ def make_ideogram_grid(
             subplot_spec=gs0[i],
             fig=fig,
             ideogram_params=ideogram_params,
+            grid_params=target_grid_params,
         )
         value_axes[target] = a0
         ideogram_axes[target] = a1
@@ -244,9 +240,11 @@ def make_genome_grid(
     genome: GENOME = GENOME.HG38,
     num_subplots=1,
     subplot_width: float = 10,
+    grid_params: Dict = None,
     height_ratio: float = 0.5,
     ideogram_factor: float = 0.1,
     ideogram_params: Dict = None,
+    fig=None,
 ) -> tuple[plt.Figure, list[Axes], Axes]:
     """
     Create a grid of subplots for a specific genome with a specified start and stop target.
@@ -260,14 +258,55 @@ def make_genome_grid(
     :param ideogram_params: Additional keyword arguments for the ideogram plotting function.
     :return: A tuple containing the figure and a list of axes for the subplots.
     """
-    fig, axes, genome_ax = _make_target_grid(
-        target=target_start,
-        target_stop=target_stop,
-        genome=genome,
-        num_subplots=num_subplots,
-        subplot_width=subplot_width,
-        height_ratio=height_ratio,
-        ideogram_factor=ideogram_factor,
-        ideogram_params=ideogram_params,
-    )
-    return fig, axes, genome_ax
+    if ideogram_params is None:
+        ideogram_params = dict()
+    ideogram_params['label_placement'] = "length"
+    if target_stop is None:
+        target_stop = target_start
+
+    cytobands_df = get_cytoband_df(genome)
+    chr_names = cytobands_df["chrom"].unique()
+    chr_names = sorted(chr_names, key=chr_to_ord)
+    targets = chr_names[chr_names.index(target_start) : chr_names.index(target_stop) + 1]
+
+    if fig is None:
+        fig = plt.figure(
+            figsize=(
+                subplot_width,
+                subplot_width * (height_ratio * num_subplots if num_subplots else height_ratio),
+            ),
+            facecolor="white",
+        )
+    gs0 = gs(1, len(targets), figure=fig, wspace=0)
+    axes = {}
+    ideograms_axes = {}
+    for i, target in enumerate(targets):
+        subplot_spec = gs0[0, i]
+        fig, ax, ideogram_ax = _make_target_grid(
+            target=target,
+            genome=genome,
+            num_subplots=num_subplots,
+            subplot_width=subplot_width,
+            height_ratio=height_ratio,
+            ideogram_factor=ideogram_factor,
+            cytobands_df=cytobands_df,
+            subplot_spec=subplot_spec,
+            ideogram_params=ideogram_params,
+            grid_params=grid_params,
+            fig=fig,
+        )
+
+        axes[target] = ax
+        ideograms_axes[target] = ideogram_ax
+    for target in targets[1:]:
+        for i, ax in enumerate(axes[target]):
+            ax.sharey(axes[targets[0]][i])
+            ax.yaxis.set_visible(False)
+            ax.spines["left"].set_visible(False)
+            if target != targets[-1]:
+                ax.spines["right"].set_visible(False)
+            ax.set_ylabel("")
+    for ax in axes[targets[0]]:
+        ax.spines["right"].set_visible(False)
+
+    return fig, axes, ideograms_axes

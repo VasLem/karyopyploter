@@ -9,7 +9,7 @@ OUT_DIR = Path(__file__).parent.parent / "example_outputs" / "genome_grid"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def test_genome_grid():
+def test_genome_grid_chr1to5():
     fig, axes, genome_ax = make_genome_grid(
         target_start="chr1",
         target_stop="chr5",
@@ -24,7 +24,10 @@ def test_genome_grid():
 
 def test_genome_grid_with_coordinates():
     fig, axes, genome_ax = make_genome_grid(
-        target_start="chr1", target_stop="chr5", num_subplots=2, ideogram_params=dict(show_coordinates=True)
+        target_start="chr1",
+        target_stop="chr5",
+        num_subplots=2,
+        ideogram_params=dict(show_coordinates=True, label_axis_offset=1.2, coordinates_params=dict(rotation=90)),
     )
     fig.savefig(TEST_DIR / "chr1_to_chr5_with_coordinates.png", dpi=300)
     assert filecmp(

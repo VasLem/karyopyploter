@@ -102,6 +102,7 @@ def test_simple_vertical_chr1_start_stop_with_coordinates():
         stop=50000000,
         show_coordinates=True,
     )
+    fig.subplots_adjust(left=0.5)
 
     fig.savefig(TEST_DIR / "vert_chr1_start_stop_with_coordinates.png")
     assert filecmp(
@@ -160,7 +161,6 @@ def test_23_vertical_hg38():
             label_params={"rotation": 90},
             orientation=ORIENTATION.VERTICAL,
             genome=genome,
-            relative=True,
         )
 
     fig.savefig(TEST_DIR / "vert_23_hg38.png")
