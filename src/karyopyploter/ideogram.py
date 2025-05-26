@@ -9,7 +9,7 @@ from typeguard import check_type
 from typing import Literal
 from typing import Callable, Union
 
-from karyopyploter.utils import get_cytoband_df, set_xmargin
+from karyopyploter.utils import get_cytoband_df
 from karyopyploter.constants import (
     GENOME,
     DETAIL,
@@ -158,9 +158,6 @@ def plot_ideogram(
     lower_anchor: int = 0,
     height: int = 1,
     curve: float = 0.02,
-    y_margin: float = 0.05,
-    right_margin: float = 0.05,
-    left_margin: float = 0.05,
     label: str | None = None,
     label_placement: Literal["height", "length"] = "height",
     label_params: dict = None,
@@ -172,7 +169,6 @@ def plot_ideogram(
     cytobands_df: pd.DataFrame = None,
     cytobands: DETAIL = DETAIL.CYTOBAND,
     relative: bool = True,
-    adjust_margins: bool = True,
     _arrange_absolute_ax_lims: bool = True,
 ):
     """
@@ -185,9 +181,6 @@ def plot_ideogram(
     :param lower_anchor: Lower anchor point for the ideogram, for outline.
     :param height: Height of the ideogram.
     :param curve: Curve factor for the ideogram edges.
-    :param y_margin: Margin for the y-axis.
-    :param right_margin: Margin for the right side of the x-axis.
-    :param left_margin: Margin for the left side of the x-axis.
     :param label: Label for the ideogram, displayed at the top or side.
     :param label_placement: Placement of the label, either "height" (at the top) or "length" (at the side).
     :param label_params: Additional parameters for the label, such as font size or rotation.
@@ -201,7 +194,6 @@ def plot_ideogram(
       "chromEnd", "gieStain", and "colour".
     :param cytobands: Whether to render cytobands
     :param relative: Whether to plot the ideogram in relative coordinates (start of chromosome is 0) (default: True if single chromosome, False if target_stop!=target_start).
-    :param adjust_margins: Whether to adjust the margins of the plot (default: True).
 
     :return: Updated axis object with the plotted ideogram.
 
@@ -368,16 +360,19 @@ def plot_ideogram(
         ax.set_xlim(lower_anchor - 0.05, height + 0.05)
     else:
         ax.set_ylim(lower_anchor - 0.05, height + 0.05)
-    if adjust_margins:
-        # Adjust x-axis margins
-        set_xmargin(ax, left=left_margin, right=right_margin)
-        ax.set_ymargin(y_margin)
 
     # Remove axis spines and ticks for a cleaner look
     for side in ("top", "right", "bottom", "left"):
         ax.spines[side].set_visible(False)
     ax.xaxis.set_visible(False)
     ax.yaxis.set_visible(False)
+
+    if show_coordinates:
+        add_ideogram_coordinates(
+            ax,
+            **coordinates_params,
+            orientation=orientation,
+        )
 
     def get_secondary_axis(ax, which: str, add_offset=False):
         for x in ax.get_children():
@@ -391,12 +386,6 @@ def plot_ideogram(
         else:
             return ax.secondary_yaxis(-0.3 if add_offset else "left")
 
-    if show_coordinates:
-        add_ideogram_coordinates(
-            ax,
-            **coordinates_params,
-            orientation=orientation,
-        )
     # Add chromosome name to the plot
     if label is not None:
         if label_placement == "height":
