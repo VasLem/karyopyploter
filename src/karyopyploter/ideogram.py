@@ -200,7 +200,7 @@ def plot_ideogram(
     >>> fig, ax = plt.subplots()
     >>> ax = plot_ideogram(ax, "chr1", start=50, stop=250, label="Chromosome 1")
     >>> ax.get_xlim()  # To test if the ideogram was plotted (not a direct measure but gives an idea)
-    (np.float64(-12447821.100000001), np.float64(261404243.1))
+    (np.float64(50.0), np.float64(250.0))
 
     # Test behaviour with a non-existent chromosome
     >>> ax = plot_ideogram(ax, "chr_1", start=50, stop=250, label="Chromosome 1")# doctest: +IGNORE_EXCEPTION_DETAIL
